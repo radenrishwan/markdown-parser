@@ -41,7 +41,12 @@ replace `markdownparser.DefaultKeyword` with your own keyword
 
 func main() {
     ...
-	keyword[markdownparser.H1] = "<h1 class=\"text-md text-slate-200 font-semibold\""
+	keyword := map[string]string{}
+	for key, value := range markdownparser.DefaultKeyword {
+		keyword[key] = value
+	}
+
+    keyword[markdownparser.H1] = "<h1 class=\"text-md text-slate-200 font-semibold\""
 
 	scan := markdownparser.NewScanner(text, keyword)
     ...
