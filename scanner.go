@@ -1,100 +1,6 @@
-package main
+package markdownparser
 
-import (
-	"errors"
-	"log"
-)
-
-func main() {
-	text := "#Hello, World\n  ##Hello, World\n*An italic text*\n**An bold text**"
-
-	scan := NewScanner(text, keyword)
-
-	scan.Scan()
-
-	log.Println(scan.Tokens)
-}
-
-// markdown syntax
-const (
-	H1 = "HEADING 1"
-	H2 = "HEADING 2"
-	H3 = "HEADING 3"
-	H4 = "HEADING 4"
-	H5 = "HEADING 5"
-
-	CH1 = "CLOSE HEADING 1"
-	CH2 = "CLOSE HEADING 2"
-	CH3 = "CLOSE HEADING 3"
-	CH4 = "CLOSE HEADING 4"
-	CH5 = "CLOSE HEADING 5"
-
-	BOLD    = "BOLD"
-	CBOLD   = "CLOSE BOLD"
-	ITALIC  = "ITALIC"
-	CITALIC = "CLOSE ITALIC"
-
-	BLOCKQUOTE  = "BLOCKQUOTE"
-	CBLOCKQUOTE = "CLOSE BLOCKQUOTE"
-
-	UNORDERED_LIST = "UNORDERED_LIST" // TODO: implement later
-	ORDERED_LIST   = "ORDERED_LIST"
-
-	CODE  = "CODE"
-	CCODE = "CLOSE CODE"
-
-	HORIZONTAL_RULE = "HORIZONTAL_RULE"
-	// LINK            = "LINK" // TODO: implement later
-	// IMAGE           = "IMAGE"
-
-	EOL   = "END OF LINE"
-	TEXT  = "TEXT"
-	CTEXT = "CLOSE TEXT"
-	NL    = "NEWLINE"
-
-	// TODO: add extended syntax later
-)
-
-var keyword = map[string]string{
-	H1: "<h1>",
-	H2: "<h2>",
-	H3: "<h3>",
-	H4: "<h4>",
-	H5: "<h5>",
-
-	CH1: "</h1>",
-	CH2: "</h2>",
-	CH3: "</h3>",
-	CH4: "</h4>",
-	CH5: "</h5>",
-
-	BOLD:  "<b>",
-	CBOLD: "</b>",
-
-	ITALIC:  "<i>",
-	CITALIC: "</i>",
-
-	BLOCKQUOTE:  "<blockquote>",
-	CBLOCKQUOTE: "</blockquote>",
-
-	UNORDERED_LIST: "<ul>",
-	ORDERED_LIST:   "<ol>", // TODO: gonna try something later
-
-	CODE:  "<code>",
-	CCODE: "</code>",
-
-	HORIZONTAL_RULE: "<hr>",
-	NL:              "<br>",
-
-	TEXT:  "<p>",
-	CTEXT: "</p>",
-}
-
-type Token struct {
-	Type  string
-	Value string
-	Line  int
-}
+import "errors"
 
 type Scanner struct {
 	Source  string
@@ -107,7 +13,7 @@ type Scanner struct {
 }
 
 func NewScanner(source string, keyword map[string]string) *Scanner {
-	return &Scanner{
+	result := &Scanner{
 		Source:  source,
 		Tokens:  []Token{},
 		Start:   0,
@@ -116,6 +22,10 @@ func NewScanner(source string, keyword map[string]string) *Scanner {
 		Keyword: keyword,
 		text:    false,
 	}
+
+	result.Scan()
+
+	return result
 }
 
 func (scanner *Scanner) Scan() []Token {
@@ -125,9 +35,6 @@ func (scanner *Scanner) Scan() []Token {
 		scanner.Start = scanner.Current
 
 		current := scanner.advance()
-		log.Println("Current char: ", string(current))
-		log.Printf("current: %d \n", scanner.Current)
-
 		if scanner.text == false && store != "" {
 			temp := scanner.Tokens[len(scanner.Tokens)-1]
 
@@ -307,7 +214,6 @@ func (scanner *Scanner) advance() byte {
 
 func (scanner *Scanner) peek(lot int) string {
 	// check if source is shorter than lot
-	log.Printf("check peek: %d - len: %d", scanner.Current+lot, len(scanner.Source))
 	if scanner.Current+lot > len(scanner.Source) {
 		return ""
 	}
