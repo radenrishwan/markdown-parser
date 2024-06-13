@@ -34,5 +34,19 @@ func main() {
 }
 ```
 
+replace `markdownparser.DefaultKeyword` with your own keyword
+
+```go
+...
+
+func main() {
+    ...
+	keyword[markdownparser.H1] = "<h1 class=\"text-md text-slate-200 font-semibold\""
+
+	scan := markdownparser.NewScanner(text, keyword)
+    ...
+}
+```
+
 ## License
 check #[License](https://github.com/radenrishwan/markdown-parser/blob/master/LICENSE)
